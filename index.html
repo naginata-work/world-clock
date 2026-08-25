@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Clock / ワールドクロック</title>
+<meta name="description" content="複数都市の現在時刻を並べて表示。海外チーム・海外の友人との時差調整に。">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4214020669195548"
+     crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: #0d1220; --card: #171e33; --text: #eef2fb; --sub: #8d96b8;
+    --accent: #60a5fa; --accent2: #fbbf24; --border: #232b47; --night: #0a0e1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Segoe UI", Arial, sans-serif;
+    background: var(--bg); color: var(--text); padding: 16px;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; }
+  .top-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .lang-btn { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  h1 { font-size: 21px; text-align: center; margin: 4px 0 4px; }
+  .lead { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .clock-row { display: flex; align-items: center; justify-content: space-between; }
+  .clock-row .city-info { display: flex; flex-direction: column; }
+  .clock-row .city-name { font-size: 15px; font-weight: bold; }
+  .clock-row .date-str { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
+  .clock-row .time-str { font-size: 26px; font-weight: bold; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .clock-row.night .time-str { color: var(--accent2); }
+  .remove { background: none; border: none; color: var(--sub); font-size: 16px; cursor: pointer; margin-left: 10px; }
+  .add-row { display: flex; gap: 8px; margin-top: 6px; }
+  select { flex: 1; padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background: #10162a; color: var(--text); }
+  .add-btn { padding: 10px 16px; border: none; border-radius: 8px; background: var(--accent); color: #061229; font-weight: bold; cursor: pointer; }
+  .footer-links { text-align: center; font-size: 12px; color: var(--sub); margin-top: 12px; line-height: 1.8; }
+  .footer-links a { color: var(--accent2); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row"><button class="lang-btn" id="langBtn">EN</button></div>
+  <h1 id="title">🌍 ワールドクロック</h1>
+  <p class="lead" id="lead">複数都市の現在時刻を並べて表示。時差調整にどうぞ。</p>
+
+  <div id="clocksContainer"></div>
+
+  <div class="card">
+    <div class="add-row">
+      <select id="citySelect"></select>
+      <button class="add-btn" id="addBtn"></button>
+    </div>
+  </div>
+
+  <p class="footer-links" id="footerLinks"></p>
+</div>
+
+<script>
+  const CITIES = [
+    ['Tokyo', 'Asia/Tokyo'], ['Seoul', 'Asia/Seoul'], ['Beijing', 'Asia/Shanghai'], ['Hong Kong', 'Asia/Hong_Kong'],
+    ['Singapore', 'Asia/Singapore'], ['Mumbai', 'Asia/Kolkata'], ['Dubai', 'Asia/Dubai'], ['Moscow', 'Europe/Moscow'],
+    ['Berlin', 'Europe/Berlin'], ['Paris', 'Europe/Paris'], ['London', 'Europe/London'], ['Cairo', 'Africa/Cairo'],
+    ['São Paulo', 'America/Sao_Paulo'], ['New York', 'America/New_York'], ['Chicago', 'America/Chicago'],
+    ['Los Angeles', 'America/Los_Angeles'], ['Honolulu', 'Pacific/Honolulu'], ['Sydney', 'Australia/Sydney'],
+    ['Auckland', 'Pacific/Auckland'], ['Toronto', 'America/Toronto']
+  ];
+  const DEFAULT_SELECTION = ['Tokyo', 'New York', 'London'];
+
+  const I18N = {
+    ja: {
+      title: '🌍 ワールドクロック',
+      lead: '複数都市の現在時刻を並べて表示。時差調整にどうぞ。',
+      addBtn: '追加',
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">カウントダウン</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">集中タイマー</a>'
+    },
+    en: {
+      title: '🌍 World Clock',
+      lead: 'See the current time in multiple cities side by side.',
+      addBtn: 'Add',
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">Countdown Timer</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">Focus Timer</a>'
+    }
+  };
+
+  function loadLang() { try { return localStorage.getItem('worldClockLang'); } catch (e) { return null; } }
+  function saveLang(l) { try { localStorage.setItem('worldClockLang', l); } catch (e) {} }
+  let lang = loadLang() === 'en' ? 'en' : 'ja';
+  function t() { return I18N[lang]; }
+
+  function loadSelectedCities() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('worldClockCities') || 'null');
+      if (Array.isArray(raw) && raw.length > 0) return raw;
+    } catch (e) {}
+    return DEFAULT_SELECTION.slice();
+  }
+  function saveSelectedCities(names) {
+    try { localStorage.setItem('worldClockCities', JSON.stringify(names)); } catch (e) {}
+  }
+
+  let selectedCities = loadSelectedCities();
+
+  function populateSelect() {
+    const sel = document.getElementById('citySelect');
+    sel.innerHTML = CITIES
+      .filter(([name]) => !selectedCities.includes(name))
+      .map(([name]) => `<option value="${name}">${name}</option>`).join('');
+  }
+
+  function renderClocks() {
+    const container = document.getElementById('clocksContainer');
+    container.innerHTML = '';
+    const now = new Date();
+    selectedCities.forEach(name => {
+      const entry = CITIES.find(c => c[0] === name);
+      if (!entry) return;
+      const tz = entry[1];
+      const hour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', hour12: false }).format(now), 10);
+      const isNight = hour < 6 || hour >= 20;
+      const timeStr = new Intl.DateTimeFormat(lang === 'ja' ? 'ja-JP' : 'en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+      const dateStr = new Intl.DateTimeFormat(lang === 'ja' ? 'ja-JP' : 'en-US', { timeZone: tz, weekday: 'short', month: 'short', day: 'numeric' }).format(now);
+      const row = document.createElement('div');
+      row.className = 'card clock-row' + (isNight ? ' night' : '');
+      row.innerHTML = `
+        <div class="city-info">
+          <div class="city-name">${name}</div>
+          <div class="date-str">${dateStr}${isNight ? ' 🌙' : ' ☀️'}</div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <div class="time-str">${timeStr}</div>
+          <button class="remove" data-name="${name}">×</button>
+        </div>`;
+      container.appendChild(row);
+    });
+    container.querySelectorAll('.remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedCities = selectedCities.filter(n => n !== btn.dataset.name);
+        saveSelectedCities(selectedCities);
+        populateSelect();
+        renderClocks();
+      });
+    });
+  }
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    const sel = document.getElementById('citySelect');
+    if (!sel.value) return;
+    selectedCities.push(sel.value);
+    saveSelectedCities(selectedCities);
+    populateSelect();
+    renderClocks();
+  });
+
+  function renderStaticText() {
+    document.getElementById('title').textContent = t().title;
+    document.getElementById('lead').textContent = t().lead;
+    document.getElementById('addBtn').textContent = t().addBtn;
+    document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    populateSelect();
+    renderClocks();
+  }
+
+  document.getElementById('langBtn').addEventListener('click', () => {
+    lang = lang === 'ja' ? 'en' : 'ja';
+    saveLang(lang);
+    document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+    renderStaticText();
+  });
+
+  document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+  renderStaticText();
+  setInterval(renderClocks, 30000);
+</script>
+</body>
+</html>
