@@ -18,7 +18,8 @@
     background: var(--bg); color: var(--text); padding: 16px;
   }
   .wrap { max-width: 520px; margin: 0 auto; }
-  .top-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .home-link { font-size: 22px; text-decoration: none; line-height: 1; }
   .lang-btn { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
   h1 { font-size: 21px; text-align: center; margin: 4px 0 4px; }
   .lead { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
@@ -39,7 +40,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="top-row"><button class="lang-btn" id="langBtn">EN</button></div>
+  <div class="top-row"><a href="https://naginata-work.github.io/" class="home-link" title="All tools">🧰</a><button class="lang-btn" id="langBtn">EN</button></div>
   <h1 id="title">🌍 ワールドクロック</h1>
   <p class="lead" id="lead">複数都市の現在時刻を並べて表示。時差調整にどうぞ。</p>
 
