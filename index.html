@@ -53,7 +53,25 @@
     </div>
   </div>
 
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="aboutTitle" style="font-size:15px; color:var(--text); margin:0 0 8px;"></h2>
+    <p id="aboutBody1" style="margin:0 0 10px;"></p>
+    <p id="aboutBody2" style="margin:0;"></p>
+  </div>
+
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="faqTitle" style="font-size:15px; color:var(--text); margin:0 0 10px;"></h2>
+    <p id="faq1Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq1A" style="margin:0 0 12px;"></p>
+    <p id="faq2Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq2A" style="margin:0;"></p>
+  </div>
+
   <p class="footer-links" id="footerLinks"></p>
+  <p style="text-align:center; font-size:11px; color:var(--sub); margin-top:4px;">
+    <a href="https://naginata-work.github.io/" style="color:var(--sub);" id="allToolsLink"></a> ・
+    <a href="https://naginata-work.github.io/privacy.html" style="color:var(--sub);" id="privacyLink"></a>
+  </p>
 </div>
 
 <script>
@@ -72,13 +90,29 @@
       title: '🌍 ワールドクロック',
       lead: '複数都市の現在時刻を並べて表示。時差調整にどうぞ。',
       addBtn: '追加',
-      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">カウントダウン</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">集中タイマー</a>'
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">カウントダウン</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">集中タイマー</a>',
+      aboutTitle: '時差調整について',
+      aboutBody1: '海外のチームメンバーと打ち合わせの時間を決めるとき、留学中の友人にメッセージを送るとき、「向こうは今何時だろう」と頭の中で時差を計算するのは地味に面倒です。サマータイムのある国だと、単純な時差の足し算では間違えることもあります。',
+      aboutBody2: 'このツールはブラウザに標準搭載されているタイムゾーン機能を使って、選んだ都市の現在時刻を自動的に正しく計算します(サマータイムも自動反映)。追加した都市はブラウザに保存されるので、次回開いたときも同じ組み合わせで表示されます。',
+      faqTitle: 'よくある質問',
+      faq1Q: 'サマータイム(夏時間)にも対応している?',
+      faq1A: 'はい。都市ごとの正式なタイムゾーン設定を使っているため、サマータイムの切り替えも自動で反映されます。手動での調整は不要です。',
+      faq2Q: 'リストにない都市を追加できる?',
+      faq2A: '現在のバージョンでは、あらかじめ用意された主要20都市から選ぶ形式になっています。近い時間帯の都市を選んで代用してください。',
     },
     en: {
       title: '🌍 World Clock',
       lead: 'See the current time in multiple cities side by side.',
       addBtn: 'Add',
-      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">Countdown Timer</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">Focus Timer</a>'
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/countdown/" target="_blank" rel="noopener">Countdown Timer</a> / <a href="https://naginata-work.github.io/focus-timer/" target="_blank" rel="noopener">Focus Timer</a>',
+      aboutTitle: 'About time zone math',
+      aboutBody1: "Scheduling a call with an overseas team, or messaging a friend studying abroad, means figuring out what time it is for them. It's a small but constant annoyance, made worse by countries that observe daylight saving time, where simple offset math can get it wrong.",
+      aboutBody2: "This tool uses the time zone data built into your browser to calculate each city's current time correctly, including automatic daylight saving adjustments. Your chosen cities are saved locally, so they're still there next time you open the page.",
+      faqTitle: 'FAQ',
+      faq1Q: 'Does it handle daylight saving time automatically?',
+      faq1A: "Yes. Each city uses its official time zone identifier, so daylight saving transitions are applied automatically — no manual adjustment needed.",
+      faq2Q: "Can I add a city that's not in the list?",
+      faq2A: "This version offers a curated list of 20 major cities. If yours isn't listed, pick one in the same or a nearby time zone as a substitute.",
     }
   };
 
@@ -156,6 +190,18 @@
     document.getElementById('lead').textContent = t().lead;
     document.getElementById('addBtn').textContent = t().addBtn;
     document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    document.getElementById('aboutTitle').textContent = t().aboutTitle;
+    document.getElementById('aboutBody1').textContent = t().aboutBody1;
+    document.getElementById('aboutBody2').textContent = t().aboutBody2;
+    document.getElementById('faqTitle').textContent = t().faqTitle;
+    document.getElementById('faq1Q').textContent = t().faq1Q;
+    document.getElementById('faq1A').textContent = t().faq1A;
+    document.getElementById('faq2Q').textContent = t().faq2Q;
+    document.getElementById('faq2A').textContent = t().faq2A;
+    document.getElementById('allToolsLink').textContent = lang === 'ja' ? '他のツール一覧' : 'All tools';
+    document.getElementById('allToolsLink').href = 'https://naginata-work.github.io/';
+    document.getElementById('privacyLink').textContent = lang === 'ja' ? 'プライバシーポリシー' : 'Privacy policy';
+    document.getElementById('privacyLink').href = 'https://naginata-work.github.io/privacy.html';
     populateSelect();
     renderClocks();
   }
